@@ -1,0 +1,3 @@
+([('agenTTrader Workstation',
+   '/Users/gaszsantana/Documents/agenttrader/dist/agenTTrader Workstation',
+   'EXECUTABLE')],)
