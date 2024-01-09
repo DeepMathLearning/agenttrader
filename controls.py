@@ -1,17 +1,6 @@
 import flet as ft
 import os
-
-class App(ft.UserControl):
-    def __init__(self):
-        super().__init__()
-    
-    def build(self):
-        return ft.Column([
-            ft.Text("QUE LO QUE")
-        ])
-
-qlq = App()    
-  
+ 
 
 # Global Variables
 global_page_height = 700
@@ -197,54 +186,7 @@ def column_with_alignment(page,align: ft.MainAxisAlignment):
         ],
     )
 
-# Página principal Configuración con el Broker
-def app_tabs(page,
-            button_clicked,
-            process_runing
-            ):
-    
-    output_text = ft.Text()
-    # Obtiene el directorio actual
-    submit_btn = ft.ElevatedButton(text="Start", on_click=button_clicked)
-    submit_btn1 = ft.ElevatedButton(text="Stop", on_click=process_runing)
-    color_dropdown = ft.Dropdown(
-        width=300,
-        options=[ft.dropdown.Option(x) for x in archivos],
-    )
 
-    tab_1 = ft.Column(
-        [
-            ft.ResponsiveRow(
-                [
-                    ft.Container(
-                        column_with_alignment(page,ft.MainAxisAlignment.CENTER),
-                        padding=5,
-                        col={"sm": 6, "md": 6, "xl": 6},
-                    ),
-                    img,
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
-            ),
-        ],
-        alignment=ft.MainAxisAlignment.CENTER,
-        expand=True,
-    )
-
-    tab_2 = ft.Row(
-        [
-            ft.Text("Selecciona tu bot:", size=30),
-            qlq,
-            color_dropdown,
-            submit_btn,
-            submit_btn1,
-            output_text,
-        ],
-        visible=False,
-    )
-
-    tab_3 = ft.Text("Tab 3", size=30, visible=False)
-    tab_4 = ft.Text("Tab 4", size=30, visible=False)
-    return tab_1, tab_2, tab_3, tab_4, output_text, color_dropdown
 
 
 
