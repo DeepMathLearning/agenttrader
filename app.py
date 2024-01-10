@@ -3,8 +3,9 @@ from controls import *
 import os
 import subprocess
 import psutil
-from binance_app import binance_config
-from ib_app import ib_config
+from binance_app import BinanceApp
+from ib_app import IBApp
+
 
 
 class AppAtws(ft.UserControl):
@@ -28,6 +29,8 @@ class AppAtws(ft.UserControl):
         self.subprocesses = None
         self.num_subprocesses = 0
         self.process = None
+        self.binance_app= BinanceApp(self.page)
+        self.ib_app = IBApp(self.page)
 
     def changetab(self, e):
         self.my_index = e.control.selected_index
@@ -94,12 +97,12 @@ class AppAtws(ft.UserControl):
     # CONFIGURACIÓN DE BINANCE
     #########################################################################################  
         if self.page.route == "/binance":
-            binance_config(self.page)
+            self.binance_app.binance_config()
     #########################################################################################   
     # CONFIGURACIÓN CON EL IB O EL TWS DE INTERACTIVE BROKERS
     #########################################################################################    
         if self.page.route == "/ib":
-            ib_config(self.page)
+            self.ib_app.ib_config()
 
     def view_pop(self, e: ft.ViewPopEvent) -> None:
         self.page.views.pop()

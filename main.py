@@ -1,10 +1,5 @@
 import flet as ft
 from controls import *
-import os
-import subprocess
-import psutil
-from binance_app import binance_config
-from ib_app import ib_config
 from app import AppAtws
 
 
