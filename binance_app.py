@@ -40,8 +40,7 @@ class BinanceApp(ft.UserControl):
         self.nombre_api = ft.TextField(
                                         label="NOMBRE API"
                                     )
-        self.list_row = []
-
+        
     # Funcion para eliminar dato
     def delete_data(self, x, y):
         cursor.execute(
@@ -49,36 +48,34 @@ class BinanceApp(ft.UserControl):
         )
         y.open = False
         # Llamar a la funcion para renderizar
-        self.all_data.controls.clear()
+        
         self.renderizar_todos()
-        #self.page.update()
+        
     
     # Función para actualizar data
-    def actualizar(self, h, x, y, z):
+    def actualizar(self, h, x, y, z, k):
         cursor.execute(
             '''UPDATE binance_api SET nombre = ?, 
-            api_key TEXT= ?, 
+            api_key= ?, 
             secret_key= ?
             WHERE id = ?''', (h, x, y, z)
         )
         connect.commit()
 
-        z.open= False
+        k.open= False
 
-        self.all_data.controls.clear()
         self.renderizar_todos()
-        #self.page.update()
 
     # READ - Mostrar todos los datos en el banco de datos
     def renderizar_todos(self):
         cursor.execute("SELECT * FROM binance_api")
         connect.commit()
-        self.list_row = []
+        list_row = []
         my_data = cursor.fetchall()
 
         for dato in my_data:
             
-            self.list_row.append(ft.DataRow(
+            list_row.append(ft.DataRow(
                                 cells=[
                                     ft.DataCell(ft.Text(dato[0])),
                                     ft.DataCell(ft.Text(dato[1])),
@@ -101,9 +98,9 @@ class BinanceApp(ft.UserControl):
                                         ft.DataColumn(ft.Text("Nombre API")),
                                         ft.DataColumn(ft.Text("Acción"))
                                     ],
-                                    rows=self.list_row
+                                    rows=list_row
                                     )
-        self.all_data.controls.append(self.tab_data)
+        #self.all_data.controls.append(self.tab_data)
         self.page.update()
         
     def cicle(self):
@@ -125,19 +122,22 @@ class BinanceApp(ft.UserControl):
                  self.edit_api_key,
                  self.edit_secret_key],
                  alignment=ft.alignment.center,
-                spacing=30,
             ),
             actions=[
                 ft.ElevatedButton(
                     'Eliminar',
                     color='white',
                     bgcolor='red',
-                    on_click=lambda e:self.delete_data(id_user, alert_dialog)
+                    on_click=lambda e:self.delete_data(id_user, 
+                                                       alert_dialog)
                     ),
                 ft.ElevatedButton(
                     'Actualizar',
-                    on_click=lambda e: self.actualizar(id_user, 
-                                                       self.edit_datos.value, 
+                    on_click=lambda e: self.actualizar( 
+                                                       self.edit_name.value, 
+                                                       self.edit_api_key.value,
+                                                       self.edit_secret_key.value,
+                                                       id_user,
                                                        alert_dialog)
                 )
             ],
@@ -154,9 +154,7 @@ class BinanceApp(ft.UserControl):
         cursor.execute("INSERT INTO binance_api (nombre, api_key, secret_key) VALUES (?, ?, ?);", 
                        [self.nombre_api.value, self.api_key.value, self.secret_key.value])
         
-        #self.all_data.controls.clear()
         self.renderizar_todos()
-        #self.page.update()
 
     def binance_config(self):
         '''
@@ -180,7 +178,7 @@ class BinanceApp(ft.UserControl):
                                             content=ft.Image(
                                                 src=f"/icons/Binance-logo.png",
                                                 # width=250,
-                                                height=200,
+                                                height=100,
                                                 fit=ft.ImageFit.CONTAIN,
                                             ),
                                             alignment=ft.alignment.center,
@@ -236,7 +234,12 @@ class BinanceApp(ft.UserControl):
                         height=50
 
                     ),
-                    self.all_data
+                    ft.Container(
+                                content=ft.Text(value="Lista de APIS agregadas", size=16),
+                                alignment=ft.alignment.center,
+                                padding=10
+                            ),
+                    self.tab_data
                 ],
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
