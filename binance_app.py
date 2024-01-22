@@ -22,6 +22,8 @@ class BinanceApp(ft.UserControl):
     def __init__(self, page):
         super().__init__()
         self.page = page
+
+        
         self.edit_name = ft.TextField(label='Nombre')
         self.edit_api_key = ft.TextField(label='API KEY')
         self.edit_secret_key = ft.TextField(label='SECRET KEY')
@@ -41,6 +43,24 @@ class BinanceApp(ft.UserControl):
                                         label="NOMBRE API"
                                     )
         
+        self.app_bar = app_second_bar(self.page)
+        self.more_bar = ft.PopupMenuButton(
+                    icon=ft.icons.MENU,
+                    items=[
+                        ft.PopupMenuItem(text="Item 1"),
+                        ft.PopupMenuItem(),  # divider
+                        ft.PopupMenuItem(text="Checked item", checked=False),
+                    ]
+                )
+                       
+        self.app_bar.actions.append(self.more_bar)
+
+    
+    def close_banner(self, e):
+        self.page.banner.open = False
+        self.page.update()
+
+
     # Funcion para eliminar dato
     def delete_data(self, x, y):
         cursor.execute(
@@ -48,7 +68,8 @@ class BinanceApp(ft.UserControl):
         )
         y.open = False
         # Llamar a la funcion para renderizar
-        
+
+        self.page.update()
         self.renderizar_todos()
         
     
@@ -64,6 +85,7 @@ class BinanceApp(ft.UserControl):
 
         k.open= False
 
+        self.page.update()
         self.renderizar_todos()
 
     # READ - Mostrar todos los datos en el banco de datos
@@ -117,7 +139,7 @@ class BinanceApp(ft.UserControl):
 
         alert_dialog = ft.AlertDialog(
             title=ft.Text(f'Editar API: {self.edit_name.value}'),
-            content= ft.Column(
+            content= ft.ResponsiveRow(
                 [self.edit_name,
                  self.edit_api_key,
                  self.edit_secret_key],
@@ -151,10 +173,34 @@ class BinanceApp(ft.UserControl):
 
     # Crear un dato nuevo dentro del banco de datos
     def add_new_data(self, e):
-        cursor.execute("INSERT INTO binance_api (nombre, api_key, secret_key) VALUES (?, ?, ?);", 
-                       [self.nombre_api.value, self.api_key.value, self.secret_key.value])
+        nombre_api = self.nombre_api.value
+        api_key = self.api_key.value
+        secret_key = self.secret_key.value
+
+        if nombre_api and api_key and secret_key:  # Verificar que los valores no estén vacíos
+            cursor.execute("INSERT INTO binance_api (nombre, api_key, secret_key) VALUES (?, ?, ?);", 
+                        (nombre_api, api_key, secret_key))
+            
+            connect.commit()  # Guardar los cambios en la base de datos
+            self.page.update()
+            self.renderizar_todos()
+        else:
+            self.page.banner = ft.Banner(
+                bgcolor=ft.colors.AMBER_100,
+                leading=ft.Icon(ft.icons.WARNING_AMBER_ROUNDED, color=ft.colors.AMBER, size=40),
+                content=ft.Text(
+                    "Debes llenar todos los campos solicitados",
+                    size=20, 
+                    color="black"
+                ),
+                actions=[
+                    ft.TextButton("OK", on_click=self.close_banner),
+                ],
+            )
+            self.page.banner.open = True
+            self.page.update()
+            
         
-        self.renderizar_todos()
 
     def binance_config(self):
         '''
@@ -167,10 +213,10 @@ class BinanceApp(ft.UserControl):
                 route="/binance",
                 controls=[
                     # page.appbar,
-                    app_second_bar(self.page),
+                    self.app_bar,
                     ft.ResponsiveRow(
                         [
-                            ft.Container(col={"sm": 2, "md": 2, "xl": 2}),
+                            
                             ft.Container(
                                 ft.Column(
                                     [
@@ -204,6 +250,26 @@ class BinanceApp(ft.UserControl):
                                                         content=self.secret_key,
                                                         alignment=ft.alignment.center,
                                                     ),
+                                                    ft.Container(
+                                                        content=ft.ElevatedButton(
+                                                                        text="Agregar +", 
+                                                                        on_click=self.add_new_data,
+                                                                        style=ft.ButtonStyle(
+                                                                                color={
+                                                                                    ft.MaterialState.HOVERED: ft.colors.BLUE,
+                                                                                    ft.MaterialState.FOCUSED: ft.colors.BLUE,
+                                                                                    ft.MaterialState.DEFAULT: ft.colors.BLACK,
+                                                                                },
+                                                                                bgcolor={ft.MaterialState.FOCUSED: ft.colors.PINK_200, "": ft.colors.YELLOW},
+                                                                                shape=ft.RoundedRectangleBorder(radius=10),
+                                                                                #color=ft.colors.WHITE
+                                                                            ),
+                                                                        width=150,
+                                                                        height=50
+
+                                                                    ),
+                                                        alignment=ft.alignment.center,
+                                                    ),
                                                 ],
                                                 alignment=ft.alignment.center,
                                                 spacing=30,
@@ -212,34 +278,32 @@ class BinanceApp(ft.UserControl):
                                     ],
                                 ),
                                 padding=5,
-                                col={"sm": 8, "md": 8, "xl": 8},
+                                col={"sm": 12, "md": 6, "xl": 6},
                             ),
+                            ft.Container(
+                                content= ft.Column(
+                                    [
+                                    ft.Container(
+                                        content=ft.Text(value="Lista de APIS agregadas", size=16),
+                                        alignment=ft.alignment.center,
+                                        padding=10
+                                    ),
+                                    ft.Container(
+                                        content=self.tab_data,
+                                        alignment=ft.alignment.center
+                                    )
+                                    
+                                    ]
+                                ),
+                                col={"sm": 12, "md": 6, "xl": 6},
+                                
+                                         ),
+
                         ],
                         alignment=ft.alignment.center,
                     ),
-                    ft.ElevatedButton(
-                        text="Agregar +", 
-                        on_click=self.add_new_data,
-                        style=ft.ButtonStyle(
-                                color={
-                                    ft.MaterialState.HOVERED: ft.colors.BLUE,
-                                    ft.MaterialState.FOCUSED: ft.colors.BLUE,
-                                    ft.MaterialState.DEFAULT: ft.colors.BLACK,
-                                },
-                                bgcolor={ft.MaterialState.FOCUSED: ft.colors.PINK_200, "": ft.colors.YELLOW},
-                                shape=ft.RoundedRectangleBorder(radius=10),
-                                #color=ft.colors.WHITE
-                            ),
-                        width=150,
-                        height=50
-
-                    ),
-                    ft.Container(
-                                content=ft.Text(value="Lista de APIS agregadas", size=16),
-                                alignment=ft.alignment.center,
-                                padding=10
-                            ),
-                    self.tab_data
+                    
+                    
                 ],
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,

@@ -89,14 +89,7 @@ def app_second_bar(page):
             center_title=False,
             actions=[
                 ft.IconButton(ft.icons.HOME, on_click=lambda _: page.go("/")),
-                ft.IconButton(ft.icons.FILTER_3),
-                ft.PopupMenuButton(
-                    items=[
-                        ft.PopupMenuItem(text="Item 1"),
-                        ft.PopupMenuItem(),  # divider
-                        ft.PopupMenuItem(text="Checked item", checked=False),
-                    ]
-                ),
+                
             ],
         )
     return rail
